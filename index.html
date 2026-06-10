@@ -71,7 +71,20 @@ svg{width:100%;height:100%;display:block;cursor:grab}svg.grabbing{cursor:grabbin
 #panel .close{position:absolute;top:13px;right:14px;cursor:pointer;color:var(--mut);font-size:20px}
 .barwrap{margin-top:6px}
 .bar{height:7px;border-radius:4px;display:inline-block}
-@media(max-width:820px){#panel{width:100%}header .sub{display:none}}
+.stk-conn{width:2px;height:28px;background:var(--line);margin:0 auto}
+.stk-card{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;transition:border-color .2s}
+.stk-card:hover{border-color:color-mix(in srgb, var(--lc) 60%, transparent)}
+.stk-head{padding:18px 22px 14px;display:flex;align-items:flex-start;gap:14px}
+.stk-badge{flex:none;width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font:700 15px 'Spline Sans Mono';color:#fff;background:var(--lc)}
+.stk-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;line-height:1.3}
+.stk-lid{color:var(--mut);font:500 11px 'Spline Sans Mono';margin-top:2px}
+.stk-desc{padding:0 22px 16px;font-size:13px;line-height:1.6;color:#c4ccda}
+.stk-subs{padding:0 22px 18px}
+.stk-subs-t{font:600 10px 'Spline Sans';letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.stk-chips{display:flex;flex-wrap:wrap;gap:5px}
+.stk-chip{font:500 12px 'Spline Sans';padding:5px 10px;border-radius:20px;background:color-mix(in srgb, var(--lc) 14%, transparent);color:color-mix(in srgb, var(--lc) 70%, #fff);border:1px solid color-mix(in srgb, var(--lc) 20%, transparent);cursor:pointer;transition:background .15s}
+.stk-chip:hover{background:color-mix(in srgb, var(--lc) 28%, transparent)}
+@media(max-width:820px){#panel{width:100%}header .sub{display:none}.stk-head{padding:14px 16px 10px;gap:10px}.stk-badge{width:38px;height:38px;font-size:13px}.stk-title{font-size:15px}.stk-desc{padding:0 16px 12px;font-size:12px}.stk-subs{padding:0 16px 14px}.stk-chip{font-size:11px;padding:4px 8px}}
 </style></head><body><div id="app">
 <header>
   <h1>AI Compute Value Chain · Atlas</h1>
@@ -81,7 +94,7 @@ svg{width:100%;height:100%;display:block;cursor:grab}svg.grabbing{cursor:grabbin
   <button class="btn" id="fit">Fit</button><button class="btn" id="reset">Reset</button>
 </header>
 <div id="toolbar">
-  <div class="tabs"><div class="tab active" data-v="map">Dependency map</div><div class="tab" data-v="matrix">Opportunity matrix</div><div class="tab" data-v="tree">Company treemap</div><div class="tab" data-v="wheel">Value-chain wheel</div></div>
+  <div class="tabs"><div class="tab active" data-v="map">Dependency map</div><div class="tab" data-v="matrix">Opportunity matrix</div><div class="tab" data-v="tree">Company treemap</div><div class="tab" data-v="wheel">Value-chain wheel</div><div class="tab" data-v="stack">Stack</div></div>
   <span class="lens" id="lensWrap">
     <select id="sizeBy"><option value="comp">size: companies</option><option value="score">size: score</option><option value="vc">size: value capture</option></select>
     <select id="colorBy"><option value="layer">colour: layer</option><option value="crit">colour: criticality</option><option value="score">colour: score</option><option value="vc">colour: value capture</option><option value="mkt">colour: market structure</option><option value="mat">colour: maturity</option><option value="ai">colour: AI potential</option><option value="angle">colour: investment angle</option></select>
@@ -96,6 +109,9 @@ svg{width:100%;height:100%;display:block;cursor:grab}svg.grabbing{cursor:grabbin
   <svg id="msvg" class="vizlayer" style="display:none"></svg>
   <div id="tsvg" class="vizlayer" style="display:none"></div>
   <svg id="wsvg" class="vizlayer" style="display:none"></svg>
+  <div id="stkDiv" class="vizlayer" style="display:none;overflow-y:auto;padding:32px 24px">
+    <div id="stkInner" style="max-width:800px;margin:0 auto"></div>
+  </div>
   <div id="tip"></div>
   <div id="legend"></div>
   <div id="panel"><span class="close" id="pClose">✕</span><div id="pBody"></div></div>
@@ -259,13 +275,16 @@ function setView(v){view=v;document.querySelectorAll(".tab").forEach(t=>t.classL
   document.getElementById("msvg").style.display=v==="matrix"?"":"none";
   document.getElementById("tsvg").style.display=v==="tree"?"":"none";
   document.getElementById("wsvg").style.display=v==="wheel"?"":"none";
+  document.getElementById("stkDiv").style.display=v==="stack"?"":"none";
+  legend.style.display=v==="stack"?"none":"";
   document.getElementById("lensWrap").style.display=(map||v==="wheel")?"":"none";
   document.getElementById("depth").style.display=map?"":"none";
   document.getElementById("vizNote").textContent=v==="matrix"?"scored nodes only · x = companies (log) · y = investment score · bubble = companies · colour = angle · red ring = choke"
     :v==="tree"?"populated nodes · area = companies · grouped by layer · colour = investment score"
     :v==="wheel"?"radius = how far downstream (core = raw materials → rim = applications) · right = silicon stream, left = power stream, converging at the data-centre ring · hover to trace inward"
+    :v==="stack"?"the nine layers of the AI compute value chain — click any segment to drill in"
     :"hover to trace dependencies · red ring = choke · depth filters the hierarchy";
-  setGrad(); if(v==="matrix")renderMatrix(); if(v==="tree")renderTree(); if(v==="wheel")renderWheel();
+  setGrad(); if(v==="matrix")renderMatrix(); if(v==="tree")renderTree(); if(v==="wheel")renderWheel(); if(v==="stack")renderStack();
 }
 function renderMatrix(){const W2=main().clientWidth,H2=main().clientHeight,s=d3.select("#msvg").attr("viewBox",`0 0 ${W2} ${H2}`);s.selectAll("*").remove();
   const L=66,R=48,T=52,B=58;
@@ -357,6 +376,37 @@ function renderWheel(){
   function wclear(){ng.style("opacity",1);g.selectAll("path.wdep").attr("stroke","#5b6573").attr("stroke-opacity",.35).attr("stroke-width",1.4);}
   const wz=d3.zoom().scaleExtent([0.5,6]).on("zoom",ev=>wrap.attr("transform",ev.transform));s.call(wz);
   s.on("click",()=>{locked=false;wclear();closePanel();});
+}
+
+// ---- stack view ----
+const STK_META=[
+  {id:"L0",desc:"Everything starts here. This layer covers the mining, refining and processing of the physical inputs that every subsequent layer depends on — copper for wiring, silicon for chips, rare earths for magnets, uranium for nuclear fuel, lithium for batteries, and the specialty gases and chemicals used in semiconductor fabrication. Geographic concentration in these supply chains creates structural chokepoints that ripple up the entire stack."},
+  {id:"L5",desc:"The most capital-intensive layer in the stack. Turning raw silicon into finished AI chips requires photolithography tools costing hundreds of millions of dollars, ultra-pure cleanrooms, and process know-how that only a handful of companies possess. TSMC, ASML, and a tight cluster of equipment and materials suppliers form the narrowest chokepoint in the entire AI value chain."},
+  {id:"L4",desc:"The chips, servers, networking gear and memory that do the actual AI training and inference work. NVIDIA's GPU dominance makes this layer a well-known chokepoint, but the full picture includes custom AI accelerators, high-bandwidth memory, InfiniBand and Ethernet networking, and the server OEMs that integrate it all into rack-scale systems."},
+  {id:"L1",desc:"AI training clusters can consume hundreds of megawatts — as much as a small city. This layer covers every generation source feeding that demand: natural gas turbines for baseload, nuclear for carbon-free firm power, solar and wind for variable renewable supply, and the batteries and fuel cells that fill the gaps. The race to secure power capacity is now one of the primary bottlenecks to new data centre builds."},
+  {id:"L2",desc:"Getting power from where it is generated to where it is consumed. High-voltage transmission lines, transformers, switchgear, substations and HVDC systems form the physical backbone. Lead times on large power transformers stretch to 3–4 years, and grid interconnection queues in the US exceed 2,500 GW. This layer is arguably the most binding near-term constraint on AI scaling."},
+  {id:"L3",desc:"The physical buildings that house AI compute. This layer spans site selection and permitting, construction, electrical distribution inside the facility, cooling systems (increasingly liquid cooling for high-density AI racks), fire suppression, physical security, and ongoing facilities management. Data centre capacity is being built at an unprecedented pace, but construction timelines and local permitting remain real constraints."},
+  {id:"L6",desc:"The software that turns physical servers into usable AI infrastructure. Cloud platforms provide on-demand access to GPU clusters, while orchestration frameworks schedule workloads across them. This layer also includes the MLOps toolchain for managing training runs, inference engines that serve models efficiently, data infrastructure for feeding training pipelines, and the observability and security tools that keep it all running."},
+  {id:"L7",desc:"The organisations training and releasing the large AI models that power everything above. This includes frontier closed-model developers, open-weight model releases, fine-tuning and model-as-a-service providers, training data suppliers, domain-specialist model builders, and the growing ecosystem of evaluation, safety and alignment services."},
+  {id:"L8",desc:"Where AI meets end users and generates revenue. This layer captures AI-native platforms, vertical industry solutions, the emerging category of autonomous agents and copilots, and the wave of AI features being embedded into incumbent software products. Ultimately, this is the demand signal that pulls investment through every layer below it."},
+  {id:"LX",desc:"Services and institutions that span the entire value chain rather than sitting in a single layer. Capital markets and project finance fund the build-out. Policy and permitting shape where and how fast infrastructure can be deployed. Professional services grease the wheels. Logistics moves heavy equipment. Labour and trades do the physical work. Standards bodies and research institutions set the rules and push the frontier."}
+];
+let stkBuilt=false;
+function renderStack(){
+  if(stkBuilt)return;stkBuilt=true;
+  const wrap=document.getElementById("stkInner");wrap.innerHTML="";
+  STK_META.forEach((meta,i)=>{
+    if(i>0){const c=document.createElement("div");c.className="stk-conn";wrap.appendChild(c);}
+    const lay=LAY[meta.id],col=lay.color;
+    const subs=N.filter(n=>n.level===1&&n.layer===meta.id);
+    const card=document.createElement("div");card.className="stk-card";card.style.setProperty("--lc",col);
+    let chips=subs.map(s=>`<span class="stk-chip" data-id="${s.id}">${esc(s.name)}</span>`).join("");
+    card.innerHTML=`<div class="stk-head"><div class="stk-badge">${meta.id}</div><div><div class="stk-title">${esc(lay.name)}</div><div class="stk-lid">Layer ${meta.id}</div></div></div><div class="stk-desc">${meta.desc}</div><div class="stk-subs"><div class="stk-subs-t">Key segments</div><div class="stk-chips">${chips}</div></div>`;
+    card.querySelectorAll(".stk-chip").forEach(el=>{
+      el.onclick=()=>{const n=BY[el.dataset.id];if(n){openPanel(n);}};
+    });
+    wrap.appendChild(card);
+  });
 }
 
 // ---- wiring ----

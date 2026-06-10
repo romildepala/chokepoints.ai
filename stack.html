@@ -1,0 +1,145 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Compute Value Chain — Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Spline+Sans:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1116;--panel:#161b22;--ink:#e8edf4;--mut:#9aa6b4;--line:#2a313c;--accent:#54c3f1}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--ink);font-family:'Spline Sans',system-ui,sans-serif}
+body{min-height:100vh;padding-bottom:80px}
+
+header{padding:20px 24px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#11161d,#0e1116);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-family:'Fraunces',serif;font-size:22px;font-weight:600}
+header .sub{color:var(--mut);font-size:13px;max-width:600px;line-height:1.45}
+.spacer{flex:1}
+header a{color:var(--accent);text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap}
+header a:hover{text-decoration:underline}
+
+.stack{max-width:800px;margin:0 auto;padding:32px 24px}
+.connector{width:2px;height:32px;background:var(--line);margin:0 auto}
+
+.layer{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;transition:border-color .2s}
+.layer:hover{border-color:color-mix(in srgb, var(--layer-color) 60%, transparent)}
+.layer-head{padding:20px 24px 16px;display:flex;align-items:flex-start;gap:16px}
+.layer-badge{flex:none;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font:700 16px 'Spline Sans Mono';color:#fff;background:var(--layer-color)}
+.layer-title{font-family:'Fraunces',serif;font-size:19px;font-weight:600;line-height:1.3}
+.layer-id{color:var(--mut);font:500 12px 'Spline Sans Mono';margin-top:2px}
+.layer-desc{padding:0 24px 18px;font-size:14px;line-height:1.65;color:#c4ccda}
+.layer-subs{padding:0 24px 20px}
+.layer-subs-title{font:600 10px 'Spline Sans';letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.layer-subs-grid{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12px 'Spline Sans';padding:5px 11px;border-radius:20px;background:color-mix(in srgb, var(--layer-color) 14%, transparent);color:color-mix(in srgb, var(--layer-color) 70%, #fff);border:1px solid color-mix(in srgb, var(--layer-color) 20%, transparent)}
+
+.cross-cut .layer-head{border-left:3px dashed var(--layer-color);margin-left:21px;border-radius:0}
+
+@media(max-width:600px){
+  header{padding:16px;flex-direction:column;align-items:flex-start}
+  .stack{padding:20px 14px}
+  .layer-head{padding:16px;gap:12px}
+  .layer-badge{width:40px;height:40px;font-size:14px;border-radius:10px}
+  .layer-title{font-size:16px}
+  .layer-desc{padding:0 16px 14px;font-size:13px}
+  .layer-subs{padding:0 16px 16px}
+  .chip{font-size:11px;padding:4px 9px}
+}
+</style></head><body>
+
+<header>
+  <div>
+    <h1>AI Compute Value Chain · Stack</h1>
+    <span class="sub">The nine layers and one cross-cutting enabler that make up the AI compute value chain — from raw materials in the ground to the applications on your screen.</span>
+  </div>
+  <span class="spacer"></span>
+  <a href="index.html">← Back to Atlas</a>
+</header>
+
+<div class="stack" id="stack"></div>
+
+<script>
+const LAYERS = [
+  {
+    id: "L0", name: "Raw materials and extraction", color: "#8a5a2b",
+    desc: "Everything starts here. This layer covers the mining, refining and processing of the physical inputs that every subsequent layer depends on — copper for wiring, silicon for chips, rare earths for magnets, uranium for nuclear fuel, lithium for batteries, and the specialty gases and chemicals used in semiconductor fabrication. Geographic concentration in these supply chains (e.g. cobalt in the DRC, rare-earth refining in China) creates structural chokepoints that ripple up the entire stack.",
+    subs: ["Industrial metals","Silicon: quartzite to polysilicon","Rare earths and magnets","Battery and storage materials","Uranium fuel cycle","Natural gas and LNG","Specialty and industrial gases","Bulk and process chemicals"]
+  },
+  {
+    id: "L5", name: "Semiconductor manufacturing and supply chain", color: "#7b52c0",
+    desc: "The most capital-intensive layer in the stack. Turning raw silicon into finished AI chips requires photolithography tools costing hundreds of millions of dollars, ultra-pure cleanrooms, and process know-how that only a handful of companies possess. TSMC, ASML, and a tight cluster of equipment and materials suppliers form the narrowest chokepoint in the entire AI value chain. A single fab costs $20B+ and takes years to build.",
+    subs: ["Wafer fabrication (foundries and IDMs)","Semiconductor capital equipment","Process control and metrology","Advanced packaging and OSAT","EDA software and semiconductor IP","Photomask and reticle supply","Semiconductor materials and consumables","Fab subsystems and components","Fab construction","Equipment aftermarket"]
+  },
+  {
+    id: "L4", name: "Compute hardware and components", color: "#2575c4",
+    desc: "The chips, servers, networking gear and memory that do the actual AI training and inference work. NVIDIA's GPU dominance makes this layer a well-known chokepoint, but the full picture includes custom AI accelerators (Google TPUs, AWS Trainium), high-bandwidth memory from SK Hynix and Samsung, InfiniBand and Ethernet networking from Broadcom and Arista, and the server OEMs that integrate it all into rack-scale systems.",
+    subs: ["AI accelerators and silicon","Host server CPUs","NICs, SmartNICs and DPUs","Memory subsystems","Storage subsystems","Networking and interconnect hardware","Servers, racks and accelerator boards","In-rack power delivery"]
+  },
+  {
+    id: "L1", name: "Power generation and its supply chain", color: "#e8842a",
+    desc: "AI training clusters can consume hundreds of megawatts — as much as a small city. This layer covers every generation source feeding that demand: natural gas turbines for baseload, nuclear for carbon-free firm power, solar and wind for variable renewable supply, and the batteries and fuel cells that fill the gaps. The race to secure power purchase agreements and generation capacity is now one of the primary bottlenecks to new data centre builds.",
+    subs: ["Natural gas-fired generation","Nuclear generation","Solar PV (utility-scale)","Onshore wind","Offshore wind","Geothermal","Hydropower and pumped hydro","Energy storage and backup","Fuel cells","Biomass and waste-to-energy","EPC and project development","Labour and workforce","Logistics and commissioning"]
+  },
+  {
+    id: "L2", name: "Transmission, grid and interconnection", color: "#2e9e4f",
+    desc: "Getting power from where it is generated to where it is consumed. High-voltage transmission lines, transformers, switchgear, substations and HVDC systems form the physical backbone. Lead times on large power transformers now stretch to 3–4 years, and grid interconnection queues in the US exceed 2,500 GW. This layer is arguably the most binding near-term constraint on AI scaling — you can build a data centre faster than you can get it connected.",
+    subs: ["Transmission and distribution utilities","HV/EHV power transformers","HV switchgear and circuit breakers","Overhead transmission lines","Underground and submarine cables","Substations","HVDC systems and power electronics","Grid interconnection services","Grid enhancing technologies","Grid software and digital operations","Transmission-connected storage","T&D O&M and services","Logistics and heavy transport","Standards and regulatory"]
+  },
+  {
+    id: "L3", name: "Data centre physical", color: "#13a3b3",
+    desc: "The physical buildings that house AI compute. This layer spans site selection and permitting, construction, electrical distribution inside the facility, cooling systems (increasingly liquid cooling for high-density AI racks), fire suppression, physical security, and ongoing facilities management. Data centre capacity is being built at an unprecedented pace, but construction timelines, water availability for cooling, and local permitting remain real constraints.",
+    subs: ["Land, siting and entitlement","Facility ownership and operation","Construction and EPC","In-building electrical distribution","Cooling and thermal management","White-space fit-out","Commissioning and testing","DCIM, BMS and monitoring","Facilities management and O&M","Physical security","Fire detection and suppression","Logistics and commissioning support","Professional and advisory services","Standards and certification","On-site generation"]
+  },
+  {
+    id: "L6", name: "Cloud and infrastructure software", color: "#4f63d2",
+    desc: "The software that turns physical servers into usable AI infrastructure. Cloud platforms (AWS, Azure, GCP) provide on-demand access to GPU clusters, while orchestration frameworks (Kubernetes, Slurm) schedule workloads across them. This layer also includes the MLOps toolchain for managing training runs, inference engines that serve models efficiently, data infrastructure for feeding training pipelines, and the observability and security tools that keep it all running.",
+    subs: ["Cloud compute platforms","Cluster orchestration and scheduling","Virtualisation and multi-tenancy","MLOps and training/serving toolchain","Inference engines and runtimes","Model optimisation, compilers and kernels","Data infrastructure for AI","Observability, monitoring and FinOps","AI security and governance"]
+  },
+  {
+    id: "L7", name: "Models and foundation labs", color: "#8a9a17",
+    desc: "The organisations training and releasing the large AI models that power everything above. This includes frontier closed-model developers (OpenAI, Anthropic, Google DeepMind), open-weight model releases (Meta's Llama, Mistral), fine-tuning and model-as-a-service providers, training data suppliers, domain-specialist model builders, and the growing ecosystem of evaluation, safety and alignment services that assess model quality and risk.",
+    subs: ["Frontier closed-model developers","Open-weight model developers","Fine-tuning and model hosting (MaaS)","Model training data inputs","Domain-specialist model developers","Model evaluation, safety and alignment"]
+  },
+  {
+    id: "L8", name: "Applications and inference (demand side)", color: "#d23b3b",
+    desc: "Where AI meets end users and generates revenue. This layer captures the AI-native platforms (ChatGPT, Midjourney), vertical industry solutions (AI in healthcare, legal, finance), the emerging category of autonomous agents and copilots, and the wave of AI features being embedded into incumbent software products. Ultimately, this is the demand signal that pulls investment through every layer below it.",
+    subs: ["AI-native horizontal platforms","Vertical and industry AI","Agents and copilots","AI embedded in incumbent software"]
+  },
+  {
+    id: "LX", name: "Cross-cutting enablers and services", color: "#b08d57", crossCut: true,
+    desc: "Services and institutions that span the entire value chain rather than sitting in a single layer. Capital markets and project finance fund the build-out. Policy and permitting shape where and how fast infrastructure can be deployed. Professional services (legal, consulting, insurance) grease the wheels. Logistics moves heavy equipment. Labour and trades do the physical work. Standards bodies and research institutions set the rules and push the frontier.",
+    subs: ["Capital and finance","Policy, permitting and regulatory","Professional and advisory services","Logistics and heavy transport","Labour, trades and staffing","Standards and certification bodies","Research, national labs and academia"]
+  }
+];
+
+const stack = document.getElementById("stack");
+
+LAYERS.forEach((layer, i) => {
+  if (i > 0) {
+    const conn = document.createElement("div");
+    conn.className = "connector";
+    if (layer.crossCut) conn.style.borderLeft = "2px dashed var(--line)";
+    stack.appendChild(conn);
+  }
+
+  const card = document.createElement("div");
+  card.className = "layer" + (layer.crossCut ? " cross-cut" : "");
+  card.style.setProperty("--layer-color", layer.color);
+  card.innerHTML = `
+    <div class="layer-head">
+      <div class="layer-badge">${layer.id}</div>
+      <div>
+        <div class="layer-title">${layer.name}</div>
+        <div class="layer-id">Layer ${layer.id}</div>
+      </div>
+    </div>
+    <div class="layer-desc">${layer.desc}</div>
+    <div class="layer-subs">
+      <div class="layer-subs-title">Key segments</div>
+      <div class="layer-subs-grid">
+        ${layer.subs.map(s => `<span class="chip">${s}</span>`).join("")}
+      </div>
+    </div>
+  `;
+  stack.appendChild(card);
+});
+</script>
+</body></html>
