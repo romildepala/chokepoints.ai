@@ -29,18 +29,17 @@ header .sub{color:var(--mut);font-size:12px;max-width:560px;line-height:1.35}
 #main{flex:1;position:relative;overflow:hidden}
 svg{width:100%;height:100%;display:block;cursor:grab}svg.grabbing{cursor:grabbing}
 .vizlayer{position:absolute;inset:0;width:100%;height:100%}
-.link{fill:none;stroke:#39424f;stroke-width:1}
-.link.hier{stroke:#222932;stroke-opacity:.45}
-.link.cat{stroke:#6f7c8c;stroke-opacity:.55;stroke-width:1.5}
-.link.leaf{stroke:#4a5563;stroke-opacity:.28;stroke-width:.9}
-.link.hl{stroke-opacity:1;stroke-width:2.2;stroke:#54c3f1}
-.node circle.core{stroke:#0e1116;stroke-width:1.2;cursor:pointer}
-.node text{font:10.5px 'Spline Sans';fill:var(--ink);pointer-events:none;paint-order:stroke;stroke:#0e1116;stroke-width:3px;stroke-linejoin:round}
+.link{fill:none;stroke:#3a4250;stroke-width:1;stroke-opacity:.28}
+.link.hl{stroke-opacity:.95;stroke-width:2.2}
+.link.up{stroke:#54c3f1}.link.down{stroke:#f0a64a}
+.node circle.core{stroke:#0e1116;stroke-width:1.5;cursor:pointer;transition:opacity .15s}
+.node text{font:11px 'Spline Sans';fill:var(--ink);pointer-events:none;paint-order:stroke;stroke:#0e1116;stroke-width:3px;stroke-linejoin:round}
 .node.anchor text{font-weight:700;font-size:13px}
-.ring{fill:none;stroke:#ff4d57;stroke-width:2}
-.dim{opacity:.1}
+.ring{fill:none;stroke:#ff4d57;stroke-width:2.2}
+.dim{opacity:.12}
 
-.stagelab{font:700 12px 'Spline Sans';letter-spacing:.4px}
+.stageband{fill:#ffffff;opacity:.012}
+.stagelab{font:600 12px 'Spline Sans';fill:#6b7688;letter-spacing:.4px;text-transform:uppercase}
 #tip{position:absolute;pointer-events:none;background:rgba(10,14,20,.96);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:12px 'Spline Sans';color:var(--ink);z-index:20;display:none;max-width:260px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
 #tip b{color:#cfe8ff}
 #legend{position:absolute;left:14px;bottom:14px;background:rgba(16,20,26,.9);border:1px solid var(--line);border-radius:12px;padding:11px 13px;max-width:250px;backdrop-filter:blur(6px);z-index:4;max-height:70%;overflow:auto}
@@ -237,18 +236,20 @@ function desc(id){const s=new Set(),st=[id];while(st.length){const c=st.pop();(d
 
 const svg=d3.select("#svg"), W=DATA.world.w, H=DATA.world.h;
 const root=svg.append("g");
-const gB=root.append("g"), gL=root.append("g"), gN=root.append("g");
+const gB=root.append("g"), gL=root.append("g"), gN=root.append("g"), gLabs=root.append("g");
 
-// column headers
-DATA.layerOrder.forEach((L,i)=>{ const x=70+i*300;
-  gB.append("text").attr("class","stagelab").attr("x",x).attr("y",30).attr("fill",LAY[L].color).text(L);
-  gB.append("text").attr("class","stagelab").attr("x",x).attr("y",48).attr("fill","#6b7688").style("font-size","10px").style("font-weight","600").text(LAY[L].name.length>30?LAY[L].name.slice(0,28)+"…":LAY[L].name);
+// stage bands + column headers
+DATA.layerOrder.forEach((L,i)=>{ const x=100+i*300;
+  gB.append("rect").attr("class","stageband").attr("x",x-130).attr("y",0).attr("width",260).attr("height",H);
+  gLabs.append("text").attr("class","stagelab").attr("x",x).attr("y",26).attr("text-anchor","middle").attr("fill",LAY[L].color).text(L);
+  gLabs.append("text").attr("class","stagelab").attr("x",x).attr("y",44).attr("text-anchor","middle").attr("fill","#6b7688").style("font-size","10px").style("font-weight","600").text(LAY[L].name.length>30?LAY[L].name.slice(0,28)+"…":LAY[L].name);
 });
 
 // links
 const linkSel=gL.selectAll("path").data(DATA.links).enter().append("path")
-  .attr("class",d=>"link "+(d.k==="h"?"hier":d.k==="c"?"cat":"leaf"))
-  .attr("d",d=>{const a=BY[d.s],b=BY[d.t];if(!a||!b)return"";const x1=a.x+a.r,y1=a.y,x2=b.x-b.r,y2=b.y,mx=(x1+x2)/2;return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;});
+  .attr("class","link")
+  .attr("d",d=>{const a=BY[d.s],b=BY[d.t];if(!a||!b||a.layer==="LX"||b.layer==="LX")return"";const x1=a.x+a.r,y1=a.y,x2=b.x-b.r,y2=b.y,mx=(x1+x2)/2;return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;})
+  .style("display",d=>{const a=BY[d.s],b=BY[d.t];return(a&&b&&a.layer!=="LX"&&b.layer!=="LX")?null:"none";});
 
 // nodes
 const nodeG=gN.selectAll("g").data(N).enter().append("g")
@@ -257,7 +258,7 @@ const nodeG=gN.selectAll("g").data(N).enter().append("g")
   .on("mouseenter",(e,n)=>{hover(n);showTip(e,n);}).on("mousemove",moveTip)
   .on("mouseleave",()=>{hideTip();if(!locked)clearHL();})
   .on("click",(e,n)=>{e.stopPropagation();locked=true;hover(n);openPanel(n);focusNode(n);});
-nodeG.filter(n=>n.critLvl>=2).append("circle").attr("class","ring").attr("r",n=>n.r+3.5);
+nodeG.filter(n=>n.critLvl>=2).append("circle").attr("class","ring").attr("r",n=>n.r+4);
 nodeG.append("circle").attr("class","core").attr("r",n=>n.r).attr("fill",n=>LAY[n.layer].color);
 nodeG.append("text").attr("x",n=>n.r+5).attr("y",4).text(n=>n.name).attr("opacity",0);
 
@@ -313,10 +314,13 @@ function refresh(){
 // ---- hover / highlight ----
 let locked=false;
 function hover(n){const a=anc(n.id),d=desc(n.id),keep=new Set([n.id,...a,...d]);
-  nodeG.classed("dim",x=>!keep.has(x.id));
-  linkSel.classed("hl",l=>keep.has(l.s)&&keep.has(l.t)).classed("dim",l=>!(keep.has(l.s)&&keep.has(l.t)));
+  nodeG.classed("dim",x=>!keep.has(x.id)&&x.layer!=="LX");
+  linkSel.classed("hl",l=>keep.has(l.s)&&keep.has(l.t))
+    .classed("up",l=>a.has(l.s)&&(a.has(l.t)||l.t===n.id))
+    .classed("down",l=>d.has(l.t)&&(d.has(l.s)||l.s===n.id))
+    .classed("dim",l=>!(keep.has(l.s)&&keep.has(l.t)));
   gL.selectAll("path.hl").raise();}
-function clearHL(){nodeG.classed("dim",0);linkSel.classed("hl dim",0);}
+function clearHL(){nodeG.classed("dim",0);linkSel.classed("hl up down dim",0);}
 function focusNode(n){const mw=main().clientWidth,mh=main().clientHeight,k=Math.max(curK,1.1);svg.transition().duration(550).call(zoom.transform,d3.zoomIdentity.translate(mw*0.4-k*n.x,mh/2-k*n.y).scale(k));}
 
 // ---- tooltip ----
