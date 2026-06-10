@@ -16,7 +16,7 @@ header .sub{color:var(--mut);font-size:13px;max-width:600px;line-height:1.45}
 header a{color:var(--accent);text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap}
 header a:hover{text-decoration:underline}
 
-.stack{max-width:800px;margin:0 auto;padding:32px 24px}
+.stack{max-width:860px;margin:0 auto;padding:32px 24px}
 .connector{width:2px;height:32px;background:var(--line);margin:0 auto}
 
 .layer{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;transition:border-color .2s}
@@ -33,6 +33,13 @@ header a:hover{text-decoration:underline}
 
 .cross-cut .layer-head{border-left:3px dashed var(--layer-color);margin-left:21px;border-radius:0}
 
+.divider{display:flex;align-items:center;gap:12px;padding:20px 0;color:var(--mut);font:600 10px 'Spline Sans';letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
+
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.track-label{font:600 11px 'Spline Sans';letter-spacing:1px;text-transform:uppercase;color:var(--accent);text-align:center;padding:0 0 12px}
+.track .connector{height:24px}
+
 @media(max-width:600px){
   header{padding:16px;padding-top:max(16px,env(safe-area-inset-top));flex-direction:column;align-items:flex-start}
   .stack{padding:20px 12px}
@@ -44,6 +51,15 @@ header a:hover{text-decoration:underline}
   .layer-subs{padding:0 14px 16px}
   .chip{font-size:11px;padding:5px 10px;-webkit-tap-highlight-color:transparent}
   body{padding-bottom:max(40px,env(safe-area-inset-bottom))}
+  .tracks{gap:12px}
+  .track .layer-desc{display:none}
+  .track .layer-subs{display:none}
+  .track .layer-head{padding:12px;gap:10px}
+  .track .layer-badge{width:36px;height:36px;font-size:12px;border-radius:8px}
+  .track .layer-title{font-size:14px}
+  .track .layer-id{font-size:10px}
+  .track-label{font-size:10px;padding:0 0 8px}
+  .divider{padding:14px 0}
 }
 </style></head><body>
 
@@ -66,27 +82,27 @@ const LAYERS = [
     subs: ["Industrial metals","Silicon: quartzite to polysilicon","Rare earths and magnets","Battery and storage materials","Uranium fuel cycle","Natural gas and LNG","Specialty and industrial gases","Bulk and process chemicals"]
   },
   {
-    id: "L5", name: "Semiconductor manufacturing and supply chain", color: "#7b52c0",
+    id: "L1", name: "Semiconductor manufacturing and supply chain", color: "#7b52c0",
     desc: "The most capital-intensive layer in the stack. Turning raw silicon into finished AI chips requires photolithography tools costing hundreds of millions of dollars, ultra-pure cleanrooms, and process know-how that only a handful of companies possess. TSMC, ASML, and a tight cluster of equipment and materials suppliers form the narrowest chokepoint in the entire AI value chain. A single fab costs $20B+ and takes years to build.",
     subs: ["Wafer fabrication (foundries and IDMs)","Semiconductor capital equipment","Process control and metrology","Advanced packaging and OSAT","EDA software and semiconductor IP","Photomask and reticle supply","Semiconductor materials and consumables","Fab subsystems and components","Fab construction","Equipment aftermarket"]
   },
   {
-    id: "L4", name: "Compute hardware and components", color: "#2575c4",
+    id: "L2", name: "Compute hardware and components", color: "#2575c4",
     desc: "The chips, servers, networking gear and memory that do the actual AI training and inference work. NVIDIA's GPU dominance makes this layer a well-known chokepoint, but the full picture includes custom AI accelerators (Google TPUs, AWS Trainium), high-bandwidth memory from SK Hynix and Samsung, InfiniBand and Ethernet networking from Broadcom and Arista, and the server OEMs that integrate it all into rack-scale systems.",
     subs: ["AI accelerators and silicon","Host server CPUs","NICs, SmartNICs and DPUs","Memory subsystems","Storage subsystems","Networking and interconnect hardware","Servers, racks and accelerator boards","In-rack power delivery"]
   },
   {
-    id: "L1", name: "Power generation and its supply chain", color: "#e8842a",
+    id: "L3", name: "Power generation and its supply chain", color: "#e8842a",
     desc: "AI training clusters can consume hundreds of megawatts — as much as a small city. This layer covers every generation source feeding that demand: natural gas turbines for baseload, nuclear for carbon-free firm power, solar and wind for variable renewable supply, and the batteries and fuel cells that fill the gaps. The race to secure power purchase agreements and generation capacity is now one of the primary bottlenecks to new data centre builds.",
     subs: ["Natural gas-fired generation","Nuclear generation","Solar PV (utility-scale)","Onshore wind","Offshore wind","Geothermal","Hydropower and pumped hydro","Energy storage and backup","Fuel cells","Biomass and waste-to-energy","EPC and project development","Labour and workforce","Logistics and commissioning"]
   },
   {
-    id: "L2", name: "Transmission, grid and interconnection", color: "#2e9e4f",
+    id: "L4", name: "Transmission, grid and interconnection", color: "#2e9e4f",
     desc: "Getting power from where it is generated to where it is consumed. High-voltage transmission lines, transformers, switchgear, substations and HVDC systems form the physical backbone. Lead times on large power transformers now stretch to 3–4 years, and grid interconnection queues in the US exceed 2,500 GW. This layer is arguably the most binding near-term constraint on AI scaling — you can build a data centre faster than you can get it connected.",
     subs: ["Transmission and distribution utilities","HV/EHV power transformers","HV switchgear and circuit breakers","Overhead transmission lines","Underground and submarine cables","Substations","HVDC systems and power electronics","Grid interconnection services","Grid enhancing technologies","Grid software and digital operations","Transmission-connected storage","T&D O&M and services","Logistics and heavy transport","Standards and regulatory"]
   },
   {
-    id: "L3", name: "Data centre physical", color: "#13a3b3",
+    id: "L5", name: "Data centre physical", color: "#13a3b3",
     desc: "The physical buildings that house AI compute. This layer spans site selection and permitting, construction, electrical distribution inside the facility, cooling systems (increasingly liquid cooling for high-density AI racks), fire suppression, physical security, and ongoing facilities management. Data centre capacity is being built at an unprecedented pace, but construction timelines, water availability for cooling, and local permitting remain real constraints.",
     subs: ["Land, siting and entitlement","Facility ownership and operation","Construction and EPC","In-building electrical distribution","Cooling and thermal management","White-space fit-out","Commissioning and testing","DCIM, BMS and monitoring","Facilities management and O&M","Physical security","Fire detection and suppression","Logistics and commissioning support","Professional and advisory services","Standards and certification","On-site generation"]
   },
@@ -113,19 +129,13 @@ const LAYERS = [
 ];
 
 const stack = document.getElementById("stack");
+const byId = {}; LAYERS.forEach(l => byId[l.id] = l);
 
-LAYERS.forEach((layer, i) => {
-  if (i > 0) {
-    const conn = document.createElement("div");
-    conn.className = "connector";
-    if (layer.crossCut) conn.style.borderLeft = "2px dashed var(--line)";
-    stack.appendChild(conn);
-  }
-
-  const card = document.createElement("div");
-  card.className = "layer" + (layer.crossCut ? " cross-cut" : "");
-  card.style.setProperty("--layer-color", layer.color);
-  card.innerHTML = `
+function makeCard(layer) {
+  const el = document.createElement("div");
+  el.className = "layer" + (layer.crossCut ? " cross-cut" : "");
+  el.style.setProperty("--layer-color", layer.color);
+  el.innerHTML = `
     <div class="layer-head">
       <div class="layer-badge">${layer.id}</div>
       <div>
@@ -139,9 +149,52 @@ LAYERS.forEach((layer, i) => {
       <div class="layer-subs-grid">
         ${layer.subs.map(s => `<span class="chip">${s}</span>`).join("")}
       </div>
-    </div>
-  `;
-  stack.appendChild(card);
-});
+    </div>`;
+  return el;
+}
+function makeConn() { const c = document.createElement("div"); c.className = "connector"; return c; }
+function makeDiv(text) { const d = document.createElement("div"); d.className = "divider"; d.textContent = text; return d; }
+
+// L0 — Foundation
+stack.appendChild(makeCard(byId["L0"]));
+stack.appendChild(makeDiv("Parallel tracks"));
+
+// Two parallel tracks
+const tracks = document.createElement("div");
+tracks.className = "tracks";
+
+const t1 = document.createElement("div");
+t1.className = "track";
+t1.innerHTML = '<div class="track-label">Silicon & Hardware</div>';
+t1.appendChild(makeCard(byId["L1"]));
+t1.appendChild(makeConn());
+t1.appendChild(makeCard(byId["L2"]));
+tracks.appendChild(t1);
+
+const t2 = document.createElement("div");
+t2.className = "track";
+t2.innerHTML = '<div class="track-label">Energy & Infrastructure</div>';
+t2.appendChild(makeCard(byId["L3"]));
+t2.appendChild(makeConn());
+t2.appendChild(makeCard(byId["L4"]));
+tracks.appendChild(t2);
+
+stack.appendChild(tracks);
+
+// Convergence
+stack.appendChild(makeDiv("Converge"));
+stack.appendChild(makeCard(byId["L5"]));
+
+// Software & AI
+stack.appendChild(makeDiv("Software & AI"));
+stack.appendChild(makeCard(byId["L6"]));
+stack.appendChild(makeConn());
+stack.appendChild(makeCard(byId["L7"]));
+stack.appendChild(makeConn());
+stack.appendChild(makeCard(byId["L8"]));
+
+// Cross-cutting
+stack.appendChild(makeConn());
+stack.appendChild(makeCard(byId["LX"]));
 </script>
 </body></html>
