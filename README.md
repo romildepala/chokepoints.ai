@@ -4,7 +4,7 @@ Interactive visualization of the AI compute value chain — a 580-node taxonomy 
 
 ## Live Demo
 
-Open `ai_value_atlas_nodes.html` in any modern browser. No server or build step required — it's a single self-contained HTML file.
+Open `index.html` in any modern browser. No server or build step required — it's a single self-contained HTML file.
 
 ## Features
 
@@ -30,11 +30,11 @@ Open `ai_value_atlas_nodes.html` in any modern browser. No server or build step 
 | Layer | Name |
 |-------|------|
 | L0 | Raw Materials & Extraction |
-| L1 | Power Generation & Supply Chain |
-| L2 | Transmission, Grid & Interconnection |
-| L3 | Data Centre Physical |
-| L4 | Compute Hardware & Components |
-| L5 | Semiconductor Manufacturing & Supply Chain |
+| L1 | Semiconductor Manufacturing & Supply Chain |
+| L2 | Compute Hardware & Components |
+| L3 | Power Generation & Supply Chain |
+| L4 | Transmission, Grid & Interconnection |
+| L5 | Data Centre Physical |
 | L6 | Cloud & Infrastructure Software |
 | L7 | Models & Foundation Labs |
 | L8 | Applications & Inference (Demand Side) |
@@ -52,10 +52,10 @@ Open `ai_value_atlas_nodes.html` in any modern browser. No server or build step 
 git clone https://github.com/romildepala/chokepoints.ai.git
 
 # Open in your browser
-open chokepoints.ai/ai_value_atlas_nodes.html
+open chokepoints.ai/index.html
 ```
 
-Or simply double-click `ai_value_atlas_nodes.html` from your file manager.
+Or simply double-click `index.html` from your file manager.
 
 ## License
 
